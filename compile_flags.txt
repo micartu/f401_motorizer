@@ -1,0 +1,16 @@
+-Wall
+-DUSE_HAL_DRIVER
+-DSTM32F401xC
+# -std=c++17
+-I/usr/local/lib
+-I./build/_deps/cpputest-src/include/
+-I./Core/Inc
+-I./Core/Inc/modules
+-I./Core/Inc/adapters
+# -I./tests/fakes/hal/
+-I./Drivers/CMSIS/Device/ST/STM32F1xx/Include
+-I./Drivers/CMSIS/Include
+-I./Drivers/STM32F1xx_HAL_Driver/Inc
+-I./Drivers/STM32F1xx_HAL_Driver/Inc/Legacy
+-I/usr/local/include
+-lfmt
