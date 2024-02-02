@@ -72,10 +72,8 @@ static char msg[150] = {'\0'};
 struct motor_action_t motor;
 static struct speed_measure_t rpm1;
 static struct speed_measure_t rpm2;
-#if 0
 static struct kalman_1d_t klm1;
 static struct kalman_1d_t klm2;
-#endif
 static struct cntr_pid_t pid1;
 static struct cntr_pid_t pid2;
 static float sp1 = 0.0;
@@ -106,9 +104,13 @@ static int fraction_of(float a, int prec) {
 
 static int frac(float a) { return fraction_of(a, 3); }
 
-static void update_pid(struct speed_measure_t *rpm, struct cntr_pid_t *pid,
-                       float sp, enum motor_side_t side) {
+static void update_pid(struct speed_measure_t *rpm,
+                       struct cntr_pid_t *pid,
+                       struct kalman_1d_t *klm,
+                       float sp, enum motor_side_t side)
+{
   float speed = current_speed(rpm);
+  speed = kalman_1d_update_estimate(klm, speed);
   enum motor_state_t action;
   pid_update(pid, sp, speed);
   action = pid->out > MIN_VAL_FOR_BRAKE ? FORWARD :
@@ -125,8 +127,8 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
       position_changed(&rpm1, TIM5->CNT);
       position_changed(&rpm2, TIM4->CNT);
     }
-    update_pid(&rpm1, &pid1, sp1, MLEFT);
-    update_pid(&rpm2, &pid2, sp2, MRIGHT);
+    update_pid(&rpm1, &pid1, &klm1, sp1, MLEFT);
+    update_pid(&rpm2, &pid2, &klm2, sp2, MRIGHT);
   }
 }
 
@@ -181,16 +183,14 @@ static void send_data_over_UART(uint32_t data) {
   }
 }
 
-#if 0
 static void
 init_kalman(struct kalman_1d_t * klm)
 {
   init_kalman_1d(klm);
-  kalman_1d_set_estimate_error(klm, 10.0);
-  kalman_1d_set_measurement_error(klm, 10.0);
-  kalman_1d_set_process_noise(klm, 1.0);
+  kalman_1d_set_estimate_error(klm, 20.0);
+  kalman_1d_set_measurement_error(klm, 20.0);
+  kalman_1d_set_process_noise(klm, 5.0);
 }
-#endif
 
 static void init_pi(struct cntr_pid_t *p) {
   init_pid(p, 0.11, 0.7, 0, 0.001, -100, 100);
@@ -262,10 +262,8 @@ int main(void)
   init_motor_action(&motor, &(TIM2->CCR1), &(TIM2->CCR2), &(TIM3->CCR1),
                     &(TIM3->CCR2));
 
-#if 0
   init_kalman(&klm1);
   init_kalman(&klm2);
-#endif
   init_pi(&pid1);
   init_pi(&pid2);
 
