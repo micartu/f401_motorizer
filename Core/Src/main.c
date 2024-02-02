@@ -26,7 +26,6 @@
 
 #include "consts.h"
 #include "irq.h"
-#include "kalman.h"
 #include "motor_action.h"
 #include "pid.h"
 #include "remote.h"
@@ -72,10 +71,6 @@ static char msg[150] = {'\0'};
 struct motor_action_t motor;
 static struct speed_measure_t rpm1;
 static struct speed_measure_t rpm2;
-#if 0
-static struct kalman_1d_t klm1;
-static struct kalman_1d_t klm2;
-#endif
 static struct cntr_pid_t pid1;
 static struct cntr_pid_t pid2;
 static float sp1 = 0.0;
@@ -181,17 +176,6 @@ static void send_data_over_UART(uint32_t data) {
   }
 }
 
-#if 0
-static void
-init_kalman(struct kalman_1d_t * klm)
-{
-  init_kalman_1d(klm);
-  kalman_1d_set_estimate_error(klm, 10.0);
-  kalman_1d_set_measurement_error(klm, 10.0);
-  kalman_1d_set_process_noise(klm, 1.0);
-}
-#endif
-
 static void init_pi(struct cntr_pid_t *p) {
   init_pid(p, 0.11, 0.7, 0, 0.001, -100, 100);
   set_integrator_limits(p, -100, 100);
@@ -262,10 +246,6 @@ int main(void)
   init_motor_action(&motor, &(TIM2->CCR1), &(TIM2->CCR2), &(TIM3->CCR1),
                     &(TIM3->CCR2));
 
-#if 0
-  init_kalman(&klm1);
-  init_kalman(&klm2);
-#endif
   init_pi(&pid1);
   init_pi(&pid2);
 

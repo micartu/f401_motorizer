@@ -47,7 +47,6 @@ Core/Src/modules/pid.c \
 Core/Src/modules/remote.c \
 Core/Src/modules/circ_buf.c \
 Core/Src/modules/circ_dbuf.c \
-Core/Src/modules/kalman.c \
 Core/Src/modules/rpm_measurer.c \
 Core/Src/stm32f4xx_it.c \
 Core/Src/stm32f4xx_hal_msp.c \
