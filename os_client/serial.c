@@ -191,10 +191,12 @@ int main(int argc, char const *argv[]) {
     } else {
       if (rec > 0) {
         packet[rec] = 0;
-        printf("received from port '%s', sz: %ld\n", packet, (long)rec);
+        printf("received from port %s sz: %ld\n", packet, (long)rec);
+        #if 0 // just to look at the bytes :)
         for (size_t i = 0; i < rec; ++i)
           printf("0x%x ", packet[i]);
         printf("\n");
+        #endif
       } else
         printf("received nothing from port '%s'.\n", device);
     }

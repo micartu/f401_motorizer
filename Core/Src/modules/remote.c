@@ -152,16 +152,15 @@ cleanup_not_parsed_data(struct UART_Descr * com)
 }
 
 static void
-check_command(struct UART_Descr * com)
+check_command_in_buffer(struct UART_Descr * com, const uint8_t * buf, size_t sz)
 {
-	const uint8_t * buf = com->uart_buffer;
-	for (size_t i = 0; i < com->not_parsed_sz; )
+	for (size_t i = 0; i < sz; )
 	{
 		if (buf[i] == PACK_BEGIN &&
-			i + 3 < com->not_parsed_sz)
+			i + 3 < sz)
 		{
 			const size_t len = buf[i + 1];
-			if (i + len + 2 <= com->not_parsed_sz)
+			if (i + len + 2 <= sz)
 			{
 				const size_t end_marker = i + len + 1;
 				if (buf[end_marker] == PACK_END)
@@ -201,6 +200,13 @@ check_command(struct UART_Descr * com)
 		}
 		++i;
 	}
+}
+
+static void
+check_command(struct UART_Descr * com)
+{
+	const uint8_t * buf = com->uart_buffer;
+	check_command_in_buffer(com, buf, com->not_parsed_sz);
 	cleanup_not_parsed_data(com);
 }
 
@@ -268,6 +274,14 @@ void uart_irq_handler(const UART_HandleTypeDef * huart)
 			break;
 		}
 	}
+}
+
+void uart_over_usb_data_received_handler(struct UART_Descr * com, uint8_t * buf, uint32_t len)
+{
+	// over the USB we receive all packets at once,
+	// so try to parse them all at once
+	com->not_parsed_sz = len;
+	check_command_in_buffer(com, buf, com->not_parsed_sz);
 }
 
 void uart_systick_handler()

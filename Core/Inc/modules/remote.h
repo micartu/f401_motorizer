@@ -56,7 +56,7 @@ struct UART_Descr
 
 /**
  * Initializes the structure needed to perform communication over UART interface
- * 
+ *
  * @param com describes UART we're working with
  * @param huart a handle for UART we're working with
  * @param buffer blob of data where we'll store the packets' data received over UART
@@ -66,7 +66,7 @@ void init_communication_uart(struct UART_Descr * com, UART_HandleTypeDef * huart
 
 /**
  * Installs a callback for proportional gain of PID control
- * 
+ *
  * @param com describes UART we're working with
  * @param func a pointer to a callback to be called to setup the prop. gain of PID
  */
@@ -74,7 +74,7 @@ void install_k_callback(struct UART_Descr * com, func_uint32_paramed_t func);
 
 /**
  * Installs a callback for integral gain of PID control
- * 
+ *
  * @param com describes UART we're working with
  * @param func a pointer to a callback to be called to setup the integral gain of PID
  */
@@ -82,7 +82,7 @@ void install_p_callback(struct UART_Descr * com, func_uint32_paramed_t func);
 
 /**
  * Installs a callback for custom function which could receive a uint32 parameter
- * 
+ *
  * @param com describes UART we're working with
  * @param func a pointer to a callback to be called
  */
@@ -90,10 +90,19 @@ void install_custom_callback(struct UART_Descr * com, func_uint32_paramed_t func
 
 /**
  * Function for being called from within the receiving IRQ handler
- * 
+ *
  * @param com describes UART we're working with
  */
 void uart_irq_handler(const UART_HandleTypeDef * huart);
+
+/**
+ * Function for being called if data was received over the USB's virtual com
+ *
+ * @param com describes UART we're working with
+ * @param buf a pointer to a buffer with received data
+ * @param len amount of received bytes
+ */
+void uart_over_usb_data_received_handler(struct UART_Descr * com, uint8_t * buf, uint32_t len);
 
 /**
  * Function for being called from within the clock IRQ handler
@@ -111,7 +120,7 @@ void uart_runloop_handler();
  * Deinitializes and frees data in the structure needed to perform communication over UART interface.
  * Must be called after init_communication_uart, if we need to free the data.
  * Not always needed on real firmware though, but needed for tests
- * 
+ *
  * @param com describes UART we're working with
  */
 void deinit_communication_uart(const struct UART_Descr * com);
