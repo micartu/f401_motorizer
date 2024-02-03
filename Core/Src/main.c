@@ -117,8 +117,8 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
   if (htim->Instance == TIM1) // tick timer: it should be called every 1 ms
   {
     if (get_current_time().ms % 100 == 0) {
-      position_changed(&rpm1, TIM5->CNT);
-      position_changed(&rpm2, TIM4->CNT);
+      position_changed_detect_overflow(&rpm1, TIM5->CNT);
+      position_changed_detect_overflow(&rpm2, TIM4->CNT);
     }
     update_pid(&rpm1, &pid1, sp1, MLEFT);
     update_pid(&rpm2, &pid2, sp2, MRIGHT);

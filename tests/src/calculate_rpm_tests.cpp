@@ -160,3 +160,35 @@ TEST(CalculateRPMTestGroup, CalculateRPMDetectUnderflowInit)
     // then
     DOUBLES_EQUAL(-2 * dp, rpm.speed, 0.1);
 }
+
+TEST(CalculateRPMTestGroup, CalculateRPMDetectUnderflowExp0)
+{
+    // given
+    const uint16_t pos = 1164;
+    const uint16_t npos = 1065;
+    rpm.speed = 10;
+    rpm.pos = pos;
+    rpm.speed_coef = -1;
+
+    // when
+    position_changed_detect_overflow(&rpm, npos);
+
+    // then
+    DOUBLES_EQUAL((npos - pos) * rpm.speed_coef, rpm.speed, 0.1);
+}
+
+TEST(CalculateRPMTestGroup, CalculateRPMDetectUnderflowExp1)
+{
+    // given
+    const uint16_t pos = 70;
+    const uint16_t npos = 65504;
+    rpm.speed = 10;
+    rpm.pos = pos;
+    rpm.speed_coef = -1;
+
+    // when
+    position_changed_detect_overflow(&rpm, npos);
+
+    // then
+    DOUBLES_EQUAL((-MAX_WHEEL_POS + npos - pos) * rpm.speed_coef, rpm.speed, 0.1);
+}

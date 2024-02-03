@@ -44,11 +44,11 @@ void position_changed_detect_overflow(struct speed_measure_t * rpm, uint16_t cur
   const uint16_t half = MAX_WHEEL_POS / 2;
   wrp_disable_irq();
   // try to detect overflow/underflow
-  if (rpm->speed > 0 && rpm->pos > half && cur_pos < half)
+  if (rpm->speed * rpm->speed_coef > 0 && rpm->pos > half && cur_pos < half)
   {
     _rpm_measurer_set_overflow_mask(rpm, MASK_POS_OVERFLOW);
   }
-  else if (rpm->speed <= 0 && rpm->pos < half && cur_pos > half)
+  else if (rpm->speed * rpm->speed_coef <= 0 && rpm->pos < half && cur_pos > half)
   {
     _rpm_measurer_set_overflow_mask(rpm, MASK_NEG_OVERFLOW);
   }
