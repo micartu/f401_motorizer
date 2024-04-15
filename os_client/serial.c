@@ -147,8 +147,17 @@ int main(int argc, char const *argv[]) {
       float f = atof(argv[3]);
       int32_t to_copy = f * powf(10, 3);
       memcpy((uint8_t *)&data, (uint8_t *)&to_copy, sizeof(data));
-    } else { // CMD_TYPE_CUST
-      data = atoi(argv[3]);
+    }
+    else
+    { // CMD_TYPE_CUST
+      if (!strcmp(argv[3], "pos"))
+        data = CUSTOM_VEL_POS;
+      else if (!strcmp(argv[3], "vel"))
+        data = CUSTOM_VEL_PID;
+      else if (!strcmp(argv[3], "ping"))
+        data = CUSTOM_PING;
+      else
+        data = atoi(argv[3]);
     }
   } else if (argc > 4) {
     float sp1 = atof(argv[3]);

@@ -63,6 +63,9 @@ TIM_HandleTypeDef htim5;
 
 #define MIN_VAL_FOR_BRAKE 5.0f
 
+#define WHEEL1_POS (TIM5->CNT)
+#define WHEEL2_POS (TIM4->CNT)
+
 static struct UART_Descr uart;
 // static uint8_t uart_buffer[32];
 
@@ -117,8 +120,8 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
   if (htim->Instance == TIM1) // tick timer: it should be called every 1 ms
   {
     if (get_current_time().ms % 100 == 0) {
-      position_changed_detect_overflow(&rpm1, TIM5->CNT);
-      position_changed_detect_overflow(&rpm2, TIM4->CNT);
+      position_changed_detect_overflow(&rpm1, WHEEL1_POS);
+      position_changed_detect_overflow(&rpm2, WHEEL2_POS);
     }
     update_pid(&rpm1, &pid1, sp1, MLEFT);
     update_pid(&rpm2, &pid2, sp2, MRIGHT);
@@ -163,14 +166,20 @@ static void set_sp(uint32_t data) {
 }
 
 static void send_data_over_UART(uint32_t data) {
-  if (data == 11) {
+  if (data == CUSTOM_VEL_PID) {
     float speed1 = rpm1.speed;
     float speed2 = rpm2.speed;
     snprintf(msg, sizeof(msg), "%d.%d,%d.%d, %ld|%d.%d,%d.%d, %ld>\r\n",
              (int)speed1, frac(speed1), (int)sp1, frac(sp1), (long)pid1.out,
              (int)speed2, frac(speed2), (int)sp2, frac(sp2), (long)pid2.out);
     CDC_Transmit_FS((uint8_t*)msg, sizeof(msg));
-  } else if (data <= 10) {
+  } else if (data == CUSTOM_VEL_POS) { // only speed + position
+    float speed1 = rpm1.speed;
+    float speed2 = rpm2.speed;
+    snprintf(msg, sizeof(msg), "%d.%d,%ld|%d.%d,%ld>\r\n",
+             (int)speed1, frac(speed1), WHEEL1_POS,
+             (int)speed2, frac(speed2), WHEEL2_POS);
+  } else if (data <= CUSTOM_PING) {
     snprintf(msg, sizeof(msg), "%ld\r", (long)data);
     CDC_Transmit_FS((uint8_t*)msg, sizeof(msg));
   }

@@ -15,6 +15,11 @@ extern "C" {
 #define CMD_TYPE_CUST		0x9
 #define CMD_TYPE_SP		    0xa
 
+// sub-commands
+#define CUSTOM_VEL_PID		11
+#define CUSTOM_VEL_POS		14
+#define CUSTOM_PING         10
+
 // packet structure constants
 
 #define PACK_BEGIN			0x51
