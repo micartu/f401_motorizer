@@ -199,13 +199,41 @@ int main(int argc, char const *argv[]) {
       printf("Nothing to read from port '%s'.\n", device);
     } else {
       if (rec > 0) {
-        packet[rec] = 0;
-        printf("received from port %s sz: %ld\n", packet, (long)rec);
-        #if 0 // just to look at the bytes :)
+        if (kcmd == CMD_TYPE_CUST && data == CUSTOM_VEL_POS)
+        {
+          // binary form of packet
+          float vel;
+          uint32_t pos;
+
+          size_t sz = 0;
+          // first wheel
+          memcpy(&vel, packet + sz, sizeof(vel));
+          sz += sizeof(vel);
+
+          memcpy(&pos, packet + sz, sizeof(pos));
+          sz += sizeof(pos);
+
+          printf("first wheel vel: '%f'; pos: '%d'.\n", vel, pos);
+
+          // second wheel
+          memcpy(&vel, packet + sz, sizeof(vel));
+          sz += sizeof(vel);
+
+          memcpy(&pos, packet + sz, sizeof(pos));
+          sz += sizeof(pos);
+
+          printf("second wheel vel: '%f'; pos: '%d'.\n", vel, pos);
+        }
+        else
+        {
+          packet[rec] = 0;
+          printf("received from port %s sz: %ld\n", packet, (long)rec);
+#if 0 // just to look at the bytes :)
         for (size_t i = 0; i < rec; ++i)
           printf("0x%x ", packet[i]);
         printf("\n");
-        #endif
+#endif
+        }
       } else
         printf("received nothing from port '%s'.\n", device);
     }

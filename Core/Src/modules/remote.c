@@ -13,7 +13,7 @@ static size_t _coms_count = 0;
 static void
 check_command(struct UART_Descr * com);
 
-static void 
+static void
 start_over(struct UART_Descr * com)
 {
 	com->not_parsed_sz = 0;
@@ -21,7 +21,7 @@ start_over(struct UART_Descr * com)
 	com->rstate = IDLE;
 }
 
-static void 
+static void
 check_already_received(struct UART_Descr * com)
 {
 	if (com->not_parsed_sz > 0)
@@ -53,10 +53,10 @@ check_already_received(struct UART_Descr * com)
 /**
  * Changes the phase of the process of receiving
  * packet we're currently in
- * 
+ *
  * @param com describes UART we're working with
  */
-static void 
+static void
 change_rec_state(struct UART_Descr * com)
 {
 	check_already_received(com);
@@ -141,7 +141,7 @@ cleanup_not_parsed_data(struct UART_Descr * com)
 {
 	const size_t len = (com->uart_ptr > com->not_parsed_sz) ?
 						com->uart_ptr - com->not_parsed_sz : 0;
-	if (len > 0) 
+	if (len > 0)
 	{
 		memmove(com->uart_buffer,
 				com->uart_buffer + com->not_parsed_sz,
@@ -310,6 +310,23 @@ void uart_runloop_handler()
 			com->rstate = IDLE;
 		}
 	}
+}
+
+size_t
+prepare_to_send_buffer(const uint8_t * buf, size_t buf_sz, uint8_t * packet, int kcmd)
+{
+	size_t sz = 0;
+	packet[sz++] = PACK_BEGIN;
+	packet[sz++] = buf_sz + 3;	 // len of packet
+	packet[sz++] = kcmd; // command to be sent
+	memcpy(packet + sz, buf, buf_sz);
+	sz += buf_sz;
+	uint8_t crc = crc8(packet + 2, sz - 2);
+	memcpy(packet + sz, &crc, sizeof(crc));
+	sz += sizeof(crc);
+	packet[sz++] = PACK_END;
+
+	return sz;
 }
 
 #undef MIN

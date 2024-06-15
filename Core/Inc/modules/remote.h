@@ -130,6 +130,18 @@ void uart_runloop_handler();
  */
 void deinit_communication_uart(const struct UART_Descr * com);
 
+/**
+ * @brief
+ * forms the packet structure to be sent over the serial connection
+ *
+ * @param buf buffer which must be transmitted
+ * @param buf_sz size of buffer which must be transmitted
+ * @param packet where the packet must be stored
+ * @param kcmd the code of command to be sent
+ * @return the amount of bytes stored in packet
+ */
+size_t prepare_to_send_buffer(const uint8_t * buf, size_t buf_sz, uint8_t * packet, int kcmd);
+
 #ifdef __cplusplus
 }
 #endif

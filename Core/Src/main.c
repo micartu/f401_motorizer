@@ -67,7 +67,6 @@ TIM_HandleTypeDef htim5;
 #define WHEEL2_POS (TIM4->CNT)
 
 static struct UART_Descr uart;
-// static uint8_t uart_buffer[32];
 
 static char msg[150] = {'\0'};
 
@@ -174,11 +173,26 @@ static void send_data_over_UART(uint32_t data) {
              (int)speed2, frac(speed2), (int)sp2, frac(sp2), (long)pid2.out);
     CDC_Transmit_FS((uint8_t*)msg, sizeof(msg));
   } else if (data == CUSTOM_VEL_POS) { // only speed + position
-    float speed1 = rpm1.speed;
-    float speed2 = rpm2.speed;
-    snprintf(msg, sizeof(msg), "%d.%d,%ld|%d.%d,%ld>\r\n",
-             (int)speed1, frac(speed1), WHEEL1_POS,
-             (int)speed2, frac(speed2), WHEEL2_POS);
+    // and it'll be only in binary format!
+    size_t sz = 0;
+    uint32_t tmp;
+    const size_t vl_sz = sizeof(tmp);
+    const size_t sp_sz = sizeof(rpm1.speed);
+    // first wheel
+    memcpy(msg, &rpm1.speed, sp_sz);
+    sz += sp_sz;
+    tmp = WHEEL1_POS;
+    memcpy(msg + sz, &tmp, vl_sz);
+    sz += vl_sz;
+
+    // second wheel
+    memcpy(msg + sz, &rpm2.speed, sp_sz);
+    sz += sp_sz;
+    tmp = WHEEL2_POS;
+    memcpy(msg + sz, &tmp, vl_sz);
+    sz += vl_sz;
+
+    CDC_Transmit_FS((uint8_t*)msg, sz);
   } else if (data <= CUSTOM_PING) {
     snprintf(msg, sizeof(msg), "%ld\r", (long)data);
     CDC_Transmit_FS((uint8_t*)msg, sizeof(msg));
