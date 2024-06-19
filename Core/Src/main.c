@@ -181,14 +181,14 @@ static void send_data_over_UART(uint32_t data) {
     // first wheel
     memcpy(msg, &rpm1.speed, sp_sz);
     sz += sp_sz;
-    tmp = WHEEL1_POS;
+    tmp = MAX_WHEEL_POS - WHEEL1_POS;
     memcpy(msg + sz, &tmp, vl_sz);
     sz += vl_sz;
 
     // second wheel
     memcpy(msg + sz, &rpm2.speed, sp_sz);
     sz += sp_sz;
-    tmp = WHEEL2_POS;
+    tmp = MAX_WHEEL_POS - WHEEL2_POS;
     memcpy(msg + sz, &tmp, vl_sz);
     sz += vl_sz;
 
