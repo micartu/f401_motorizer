@@ -229,7 +229,6 @@ void deinit_communication_uart(const struct UART_Descr * com)
 {
     for (size_t i = 0; i < _coms_count; ++i)
     {
-        struct UART_Descr * com = _coms[i];
         if (com == _coms[i])
         {
 			for (size_t j = i + 1; j <_coms_count; ++j)
