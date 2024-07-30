@@ -193,6 +193,18 @@ static void send_data_over_UART(uint32_t data) {
     sz += vl_sz;
 
     CDC_Transmit_FS((uint8_t*)msg, sz);
+  } else if (data == CUSTOM_VEL) { // only speed
+    size_t sz = 0;
+    const size_t sp_sz = sizeof(rpm1.speed);
+    // first wheel
+    memcpy(msg, &rpm1.speed, sp_sz);
+    sz += sp_sz;
+
+    // second wheel
+    memcpy(msg + sz, &rpm2.speed, sp_sz);
+    sz += sp_sz;
+
+    CDC_Transmit_FS((uint8_t*)msg, sz);
   } else if (data <= CUSTOM_PING) {
     snprintf(msg, sizeof(msg), "%ld\r", (long)data);
     CDC_Transmit_FS((uint8_t*)msg, sizeof(msg));
