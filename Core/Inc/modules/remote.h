@@ -19,6 +19,7 @@ extern "C" {
 #define CUSTOM_VEL_PID		11
 #define CUSTOM_VEL_POS		14
 #define CUSTOM_VEL		    15
+#define CUSTOM_POS		    16
 #define CUSTOM_PING         10
 
 // packet structure constants
