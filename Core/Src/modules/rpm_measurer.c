@@ -24,6 +24,14 @@ static void _position_changed(struct speed_measure_t * rpm, uint16_t cur_pos)
   ((rpm->overlow & MASK_NEG_OVERFLOW) ? -MAX_WHEEL_POS : 0);
   rpm->speed = (pos - rpm->pos) * rpm->speed_coef;
   rpm->pos = cur_pos;
+  // count over/under-flows
+  if (rpm->overlow & MASK_POS_OVERFLOW)
+  {
+    rpm->overflown_counter++;
+  } else if (rpm->overlow & MASK_NEG_OVERFLOW)
+  {
+    rpm->overflown_counter--;
+  }
   rpm->overlow = 0;
 }
 

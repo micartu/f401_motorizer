@@ -220,6 +220,27 @@ static void send_data_over_UART(uint32_t data) {
     sz += vl_sz;
 
     CDC_Transmit_FS((uint8_t*)msg, sz);
+  } else if (data == WHEEL_TICKS) { // raw wheel ticks
+    size_t sz = 0;
+    uint16_t tmp;
+    const size_t tick_sz = sizeof(tmp);
+    const size_t ov_sz = sizeof(rpm1.overflown_counter);
+
+    // first wheel
+    tmp = WHEEL1_POS;
+    memcpy(msg + sz, &tmp, tick_sz);
+    sz += tick_sz;
+    memcpy(msg + sz, &rpm1.overflown_counter, ov_sz);
+    sz += ov_sz;
+
+    // second wheel
+    tmp = WHEEL2_POS;
+    memcpy(msg + sz, &tmp, tick_sz);
+    sz += tick_sz;
+    memcpy(msg + sz, &rpm2.overflown_counter, ov_sz);
+    sz += ov_sz;
+
+    CDC_Transmit_FS((uint8_t*)msg, sz);
   } else if (data <= CUSTOM_PING) {
     snprintf(msg, sizeof(msg), "%ld\r", (long)data);
     CDC_Transmit_FS((uint8_t*)msg, sizeof(msg));

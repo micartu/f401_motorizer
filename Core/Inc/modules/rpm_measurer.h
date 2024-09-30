@@ -21,6 +21,8 @@ struct speed_measure_t
 	float speed;
 	/// speed convertion coefficient
 	float speed_coef;
+	/// how many over(under)-flows have happened already (negative=under)
+	int32_t overflown_counter;
 };
 
 /**
